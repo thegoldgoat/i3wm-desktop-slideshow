@@ -261,8 +261,34 @@ class Wallpaper_Changer(object):
         except:
             print 'Unable to change Background!'
 
+# Folder where there will be placed the pidFile
+PID_FOLDER = '/tmp'
+SIGKILL = 9
+
+
+class PidFile(object):
+    def create_pid(self):
+        PidFile = open(PID_FOLDER + '/pidfile' + self.script_name, 'w')
+        PidFile.write(str(os.getpid()))
+
+    def __init__(self, script_name):
+        '''
+           script_name is the name that will be used as pidFile
+        '''
+        self.script_name = script_name
+        self.kill_previous()
+        self.create_pid()
+
+    def kill_previous(self):
+        try:
+            inPidFile = open(PID_FOLDER + '/pidfile' + self.script_name, 'r')
+            os.kill(int(inPidFile.read()), SIGKILL)
+        except Exception:
+            pass
 
 if __name__ == '__main__':
+    # Kill previous
+    pidFileKiller = PidFile('wall_changer')
     indicator = Wallpaper_Changer_Indicator()
     gtk.gdk.threads_init()
     gtk.main()
